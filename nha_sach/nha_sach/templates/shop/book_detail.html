@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cover %}
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('shop.book_list') }}">Sách</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('shop.book_list', category=book.category_id) }}">{{ book.category.name }}</a></li>
+    <li class="breadcrumb-item active">{{ book.title }}</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+  <div class="col-md-4">{{ cover(book, "book-cover-lg") }}</div>
+  <div class="col-md-8">
+    <h1 class="h3">{{ book.title }}</h1>
+    <p class="text-muted mb-1">
+      Tác giả: {{ book.author }}
+      {% if book.publisher or book.year %}
+        · {{ book.publisher or '' }}{% if book.publisher and book.year %}, {% endif %}{{ book.year or '' }}
+      {% endif %}
+    </p>
+    <p class="price fs-4 mb-1">{{ book.price|vnd }}</p>
+    <p class="mb-1">Danh mục: {{ book.category.name }}</p>
+    <p>
+      {% if book.stock > 0 %}<span class="text-success">● Còn {{ book.stock }} cuốn</span>
+      {% else %}<span class="text-danger">● Hết hàng</span>{% endif %}
+    </p>
+
+    {% if book.stock > 0 %}
+    <form method="post" action="{{ url_for('shop.cart_add', book_id=book.id) }}" class="mb-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="form-label" for="qty">Số lượng</label>
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <div class="input-group qty-group">
+          <button type="button" class="btn btn-outline-secondary" data-step="-1">−</button>
+          <input type="number" id="qty" name="quantity" class="form-control text-center"
+                 value="1" min="1" max="{{ max_add }}" {{ 'disabled' if max_add < 1 }}>
+          <button type="button" class="btn btn-outline-secondary" data-step="1">+</button>
+        </div>
+        <span class="small text-muted">
+          tối đa {{ max_add }}{% if in_cart %} (đã có {{ in_cart }} trong giỏ){% endif %}
+        </span>
+      </div>
+      <button class="btn btn-primary mt-3" {{ 'disabled' if max_add < 1 }}>🛒 Thêm vào giỏ hàng</button>
+    </form>
+    {% else %}
+      <button class="btn btn-secondary" disabled>Hết hàng</button>
+    {% endif %}
+
+    {% if book.description %}
+      <h2 class="h6 mt-4">Mô tả</h2>
+      <p style="white-space: pre-line">{{ book.description }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll('.qty-group [data-step]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var input = document.getElementById('qty');
+      var next = (parseInt(input.value, 10) || 1) + parseInt(btn.dataset.step, 10);
+      var min = parseInt(input.min, 10) || 1;
+      var max = parseInt(input.max, 10) || min;
+      input.value = Math.min(Math.max(next, min), max);
+    });
+  });
+</script>
+{% endblock %}

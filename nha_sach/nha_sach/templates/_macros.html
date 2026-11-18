@@ -1,0 +1,40 @@
+{# Ảnh bìa (hoặc khung trống nếu chưa có ảnh) #}
+{% macro cover(book, cls="") -%}
+  {% if book.cover %}
+    <img src="{{ url_for('static', filename='uploads/covers/' ~ book.cover) }}"
+         class="book-cover {{ cls }}" alt="{{ book.title }}">
+  {% else %}
+    <div class="book-cover book-cover-empty {{ cls }}">📖</div>
+  {%- endif %}
+{%- endmacro %}
+
+{# Một ô nhập có nhãn, lỗi, ghi chú #}
+{% macro field(f, cls="form-control", help="") -%}
+  <div class="mb-3">
+    <label class="form-label" for="{{ f.id }}">{{ f.label.text }}
+      {%- if f.flags.required %} <span class="text-danger">*</span>{% endif %}</label>
+    {{ f(class=cls ~ (' is-invalid' if f.errors else ''), **kwargs) }}
+    {% for e in f.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+    {% if help %}<div class="form-text">{{ help }}</div>{% endif %}
+  </div>
+{%- endmacro %}
+
+{# Nhãn trạng thái đơn hàng có màu #}
+{% macro status_badge(order) -%}
+  <span class="badge status-badge {{ order.status_class }}">{{ order.status }}</span>
+{%- endmacro %}
+
+{# Phân trang, giữ nguyên các bộ lọc hiện tại #}
+{% macro pager(p, endpoint, filters) -%}
+  {% if p.pages > 1 %}
+  <nav aria-label="Phân trang">
+    <ul class="pagination pagination-sm mb-0">
+      {% for n in range(1, p.pages + 1) %}
+        <li class="page-item {{ 'active' if n == p.page }}">
+          <a class="page-link" href="{{ url_for(endpoint, page=n, **filters) }}">{{ n }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+  {% endif %}
+{%- endmacro %}

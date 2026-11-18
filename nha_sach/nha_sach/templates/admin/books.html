@@ -1,0 +1,65 @@
+{% extends "admin/layout.html" %}
+{% from "_macros.html" import pager %}
+{% block title %}Quản lý sách{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">Sách ({{ pagination.total }})</h1>
+  <a class="btn btn-primary" href="{{ url_for('admin.book_form') }}">+ Thêm sách</a>
+</div>
+
+<form class="row g-2 mb-3" method="get" action="{{ url_for('admin.books') }}">
+  <div class="col-md"><input class="form-control" name="q" value="{{ q }}" placeholder="Tìm tên sách, tác giả..."></div>
+  <div class="col-md-3">
+    <select name="category" class="form-select">
+      <option value="">Mọi danh mục</option>
+      {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if c.id == category_id }}>{{ c.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="stock" class="form-select">
+      <option value="">Tồn kho</option>
+      <option value="con" {{ 'selected' if stock == 'con' }}>Còn hàng</option>
+      <option value="sap_het" {{ 'selected' if stock == 'sap_het' }}>Sắp hết (≤ {{ low_stock }})</option>
+      <option value="het" {{ 'selected' if stock == 'het' }}>Hết hàng</option>
+    </select>
+  </div>
+  <div class="col-auto"><button class="btn btn-primary">Lọc</button></div>
+</form>
+
+<div class="table-responsive">
+  <table class="table bg-white align-middle">
+    <thead class="table-light">
+      <tr><th>Tên sách / Tác giả</th><th>Danh mục</th><th class="text-end">Giá</th><th class="text-end">Tồn</th><th class="text-end">Thao tác</th></tr>
+    </thead>
+    <tbody>
+      {% for b in pagination.items %}
+      <tr>
+        <td><div class="fw-semibold">{{ b.title }}</div><div class="small text-muted">{{ b.author }}</div></td>
+        <td>{{ b.category.name }}</td>
+        <td class="text-end">{{ b.price|vnd }}</td>
+        <td class="text-end {{ 'text-danger fw-bold' if b.stock == 0 }}">{{ b.stock }}</td>
+        <td class="text-end">
+          <div class="d-inline-flex gap-2">
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin.book_form', book_id=b.id) }}">Sửa</a>
+            <form method="post" action="{{ url_for('admin.book_delete', book_id=b.id) }}"
+                  onsubmit="return confirm('Xoá sách “{{ b.title|replace("'", "") }}”?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
+              <button class="btn btn-outline-danger btn-sm" {% if b.id in ordered_ids %}disabled title="Sách đã có trong đơn hàng"{% endif %}>Xoá</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted">Không có sách phù hợp.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="d-flex justify-content-between align-items-center">
+  <div class="small text-muted">Hiển thị {{ first }} – {{ last }} / {{ pagination.total }} sách</div>
+  {{ pager(pagination, 'admin.books', filters) }}
+</div>
+{% endblock %}

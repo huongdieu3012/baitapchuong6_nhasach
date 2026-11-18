@@ -1,0 +1,63 @@
+:root {
+  --navy: #0b3a75;
+  --orange: #f26a0f;
+  --ink-dark: #1b2437;
+}
+
+body { background: #f4f6fa; }
+
+/* ---- Trang bán hàng ---- */
+.shop-nav { background: var(--navy); }
+.cart-badge { background: var(--orange); color: #fff; }
+.price { color: var(--orange); font-weight: 700; }
+.text-orange { color: var(--orange); }
+
+.book-cover {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: #e6eaf1;
+  border-radius: .375rem .375rem 0 0;
+  display: block;
+}
+.book-cover-empty { display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #9aa6b8; }
+.book-cover-lg { aspect-ratio: 3 / 4; border-radius: .5rem; }
+.book-cover-md { aspect-ratio: 3 / 4; max-width: 180px; border-radius: .5rem; }
+.book-cover-sm { width: 48px; aspect-ratio: 3 / 4; border-radius: .25rem; font-size: 1.2rem; flex-shrink: 0; }
+.book-title { font-weight: 600; color: #222; text-decoration: none; }
+.book-title:hover { text-decoration: underline; }
+.qty-group { max-width: 160px; }
+.qty-group input::-webkit-outer-spin-button,
+.qty-group input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qty-group input { -moz-appearance: textfield; }
+
+/* ---- Trang quản trị ---- */
+.admin-wrap { display: flex; min-height: 100vh; }
+.admin-side { width: 220px; flex-shrink: 0; background: var(--ink-dark); color: #fff; padding: 1.25rem 0; }
+.admin-side .nav-link { color: #cfd6e4; padding: .55rem 1rem; }
+.admin-side .nav-link.active, .admin-side .nav-link:hover { background: #2b3750; color: #fff; }
+.admin-main { flex: 1; min-width: 0; padding: 1.5rem; }
+@media (max-width: 767px) {
+  .admin-wrap { flex-direction: column; }
+  .admin-side { width: 100%; }
+}
+
+.stat-card { background: #fff; border: 1px solid #dde3ee; border-radius: .5rem; padding: .9rem 1rem; }
+.stat-label { font-size: .8rem; color: #6b7690; }
+.stat-value { font-size: 1.6rem; font-weight: 700; }
+
+.row-link { cursor: pointer; }
+
+/* Nhãn trạng thái đơn hàng */
+.status-badge { font-weight: 500; }
+.status-pending  { background: #ffe9d6; color: #b34a00; }
+.status-shipping { background: #dbe8ff; color: #1b4fb5; }
+.status-done     { background: #d9f5e3; color: #17753d; }
+.status-canceled { background: #e7eaf0; color: #5a6477; }
+
+/* Biểu đồ cột 7 ngày */
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 140px; }
+.bar-col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.bar { width: 100%; min-height: 2px; background: #8fb0f5; border-radius: 3px 3px 0 0; }
+.bar-last { background: #2563eb; }
+.bar-label { font-size: .65rem; color: #6b7690; margin-top: 4px; }

@@ -1,0 +1,67 @@
+{% extends "admin/layout.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Tổng quan{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Tổng quan</h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3"><div class="stat-card">
+    <div class="stat-label">Đầu sách</div><div class="stat-value">{{ total_books }}</div></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card">
+    <div class="stat-label">Đơn chờ xác nhận</div><div class="stat-value text-orange">{{ pending }}</div></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card">
+    <div class="stat-label">Doanh thu tháng {{ month }}</div><div class="stat-value text-success">{{ revenue|vnd }}</div></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card">
+    <div class="stat-label">Sắp hết hàng</div><div class="stat-value text-danger">{{ low_count }}</div></div></div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <h2 class="h6">Đơn hàng mới nhất</h2>
+    <table class="table table-sm bg-white align-middle">
+      <thead class="table-light"><tr><th>Mã</th><th>Khách hàng</th><th class="text-end">Tổng tiền</th><th>Trạng thái</th></tr></thead>
+      <tbody>
+        {% for o in latest %}
+        <tr>
+          <td><a href="{{ url_for('admin.order_detail', order_id=o.id) }}">#{{ o.id }}</a></td>
+          <td>{{ o.full_name }}</td>
+          <td class="text-end">{{ o.total|vnd }}</td>
+          <td>{{ status_badge(o) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted">Chưa có đơn hàng.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{{ url_for('admin.orders') }}">Xem tất cả đơn hàng →</a>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card card-body mb-4">
+      <h2 class="h6">Sắp hết hàng (≤ {{ low_stock }})</h2>
+      {% for b in low_books %}
+        <div class="d-flex justify-content-between py-1">
+          <a href="{{ url_for('admin.book_form', book_id=b.id) }}">{{ b.title }}</a>
+          <strong class="{{ 'text-danger' if b.stock == 0 else 'text-orange' }}">{{ b.stock }}</strong>
+        </div>
+      {% else %}
+        <div class="text-muted small">Tất cả sách đều còn đủ hàng.</div>
+      {% endfor %}
+      <a class="mt-2" href="{{ url_for('admin.books', stock='sap_het') }}">Nhập thêm sách →</a>
+    </div>
+
+    <div class="card card-body">
+      <h2 class="h6">Doanh thu 7 ngày</h2>
+      <div class="bar-chart">
+        {% for c in chart %}
+          <div class="bar-col" title="{{ c.label }}: {{ c.value|vnd }}">
+            <div class="bar {{ 'bar-last' if loop.last }}" style="height: {{ (c.value / chart_max * 100)|round|int }}%"></div>
+            <div class="bar-label">{{ c.label }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
